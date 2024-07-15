@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.oracle.mapper.DoctorsMapper">
+
+    <select id="selectDoctorsByJobnumber" resultType="com.oracle.pojo.Doctors">
+        SELECT doctor_id,job_number,password FROM doctors WHERE job_number=#{job_number}
+    </select>
+
+    <select id="getAll" resultType="com.oracle.pojo.ProfessionalTitle">
+        select * from professional_titles
+    </select>
+
+   <update id="modifyDoctor" parameterType="com.oracle.pojo.Doctors">
+       update doctors
+            <set>
+                <if test="#{email != null and email != ''}">
+                    email=#{email},
+                </if>
+
+                <if test="#{phone != null and phone != ''}">
+                    phone=#{phone},
+                </if>
+
+                <if test="#{avatar != null and avatar != ''}">
+                    avatar=#{avatar},
+                </if>
+
+                <if test="#{introduction != null and  introduction != ''}">
+                    introduction=#{introduction},
+                </if>
+            </set>
+                where doctor_id=#{doctor_id}
+   </update>
+
+    <select id="selectDoctorSearch" resultType="com.oracle.pojo.Doctors">
+        select  d.doctor_id,d.job_number,
+                d.name,d.phone,
+                d.email,d.entry_date,
+                dept.department_name as departmentName,
+                p.title_name as professionalTitleName
+        from doctors d left join departments dept on (dept.department_id = d.department_id)
+        left join professional_titles p on(d.professional_title_id = p.id)
+        <where>
+            <if test="name != null and name != ''">
+                name like concat(#{name},'%')
+            </if>
+            <if test="pid!=null">
+                and professional_title_id=#{pid}
+            </if>
+        </where>
+    </select>
+</mapper>
